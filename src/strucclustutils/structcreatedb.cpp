@@ -79,7 +79,7 @@ static inline bool compareByFirst(const std::pair<T, U>& a, const std::pair<T, U
 
 std::string removeModel(const std::string& input) {
     size_t modelIndex = input.find("MODEL");
-    if (modelIndex == std::string::npos){
+    if (modelIndex == std::string::npos) {
         return input;
     }
     std::string prefix = input.substr(0, modelIndex);
@@ -147,8 +147,8 @@ writeStructureEntry(SubstitutionMatrix & mat, GemmiWrapper & readStructure, Stru
                                                         &readStructure.c[chainStart],
                                                         &readStructure.cb[chainStart],
                                                         chainLen);
-        for(size_t pos = 0; pos < chainLen; pos++){
-            if(readStructure.ca_bfactor[pos] < maskBfactorThreshold){
+        for(size_t pos = 0; pos < chainLen; pos++) {
+            if(readStructure.ca_bfactor[pos] < maskBfactorThreshold) {
                 alphabet3di.push_back(tolower(mat.num2aa[static_cast<int>(states[pos])]));
                 alphabetAA.push_back(tolower(readStructure.ami[chainStart+pos]));
             }else{
@@ -161,22 +161,22 @@ writeStructureEntry(SubstitutionMatrix & mat, GemmiWrapper & readStructure, Stru
         torsiondbw.writeData(alphabet3di.data(), alphabet3di.size(), dbKey, thread_idx);
         aadbw.writeData(alphabetAA.data(), alphabetAA.size(), dbKey, thread_idx);
         header.clear();
-        if (Util::endsWith(".gz", readStructure.names[ch])){
+        if (Util::endsWith(".gz", readStructure.names[ch])) {
             header.append(Util::remove_extension(Util::remove_extension(readStructure.names[ch])));
         }
         else{
             header.append(Util::remove_extension(readStructure.names[ch]));
         }
-        if(readStructure.modelCount > 1){
+        if(readStructure.modelCount > 1) {
             header.append("_MODEL_");
             header.append(std::to_string(readStructure.modelIndices[ch]));
         }
         if(chainNameMode == LocalParameters::CHAIN_MODE_ADD ||
-            (chainNameMode == LocalParameters::CHAIN_MODE_AUTO && readStructure.names.size() > 1)){
+            (chainNameMode == LocalParameters::CHAIN_MODE_AUTO && readStructure.names.size() > 1)) {
             header.push_back('_');
             header.append(readStructure.chainNames[ch]);
         }
-        if(readStructure.title.size() > 0){
+        if(readStructure.title.size() > 0) {
             header.push_back(' ');
             header.append(readStructure.title);
         }
@@ -185,7 +185,7 @@ writeStructureEntry(SubstitutionMatrix & mat, GemmiWrapper & readStructure, Stru
 #pragma omp critical
         {
             std::string filenameWithExtension = filename;
-            if (Util::endsWith(".gz", filename)){
+            if (Util::endsWith(".gz", filename)) {
                 filenameWithExtension = Util::remove_extension(filename);
             }
             std::string filenameWithoutExtension = Util::remove_extension(filenameWithExtension);
@@ -508,7 +508,7 @@ int structcreatedb(int argc, const char **argv, const Command& command) {
         progress.updateProgress();
 #ifdef OPENMP
         int localThreads = par.threads;
-        if(localThreads > 1){
+        if(localThreads > 1) {
             needsReorderingAtTheEnd = true;
         }
 #endif
@@ -682,7 +682,7 @@ int structcreatedb(int argc, const char **argv, const Command& command) {
         for (size_t i = 0; i < looseFiles.size(); i++) {
             progress.updateProgress();
 
-            if(readStructure.load(looseFiles[i], (GemmiWrapper::Format)inputFormat) == false){
+            if(readStructure.load(looseFiles[i], (GemmiWrapper::Format)inputFormat) == false) {
                 incorrectFiles++;
                 continue;
             }
@@ -972,7 +972,7 @@ int structcreatedb(int argc, const char **argv, const Command& command) {
             entry.entryName = removeModel(entryNameWithModel);
             std::pair<size_t, unsigned int> fileIdModelEntry = entrynameToFileId[entryNameWithModel];
             size_t fileId = fileIdModelEntry.first;
-            if(modelFileIdLookup.find(fileIdModelEntry) == modelFileIdLookup.end()){
+            if(modelFileIdLookup.find(fileIdModelEntry) == modelFileIdLookup.end()) {
                 modelFileIdLookup[fileIdModelEntry] = globalFileNumber;
                 entry.fileNumber = globalFileNumber;
                 globalFileNumber++;
