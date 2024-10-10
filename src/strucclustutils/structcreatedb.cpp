@@ -359,6 +359,22 @@ writeStructureEntry(SubstitutionMatrix & mat, GemmiWrapper & readStructure, Stru
             }
         }
         else if (par.dbExtractionMode == LocalParameters::DB_EXTRACT_MODE_INTERFACE) {
+            if (chainLen <= 3) {
+                tooShort++;
+                continue;
+            }
+            bool allX = true;
+            for (size_t pos = 0; pos < chainLen; pos++) {
+                const char aa = readStructure.ami[chainStart+pos];
+                if (aa != 'X' && aa != 'x') {
+                    allX = false;
+                    break;
+                }
+            }
+            if (allX) {
+                notProtein++;
+                continue;
+            }
             for (size_t pos = 0; pos < chainLen; pos++) {
                 alphabet3di.push_back(readStructure.seq3di[chainStart+pos]);
                 alphabetAA.push_back(readStructure.ami[chainStart+pos]);
