@@ -1272,6 +1272,8 @@ int structcreatedb(int argc, const char **argv, const Command& command) {
     }
     
     Debug(Debug::INFO) << "Ignore " << (tooShort+incorrectFiles+notProtein) << " out of " << globalCnt << ".\n";
-    Debug(Debug::INFO) << "Too short: " << tooShort << ", incorrect: " << incorrectFiles << ", not proteins: " << notProtein << ".\n";
+    if (par.dbExtractionMode == LocalParameters::DB_EXTRACT_MODE_CHAIN) {
+        Debug(Debug::INFO) << "Too short: " << tooShort << ", incorrect: " << incorrectFiles << ", not proteins: " << notProtein << ".\n";
+    }
     return EXIT_SUCCESS;
 }
