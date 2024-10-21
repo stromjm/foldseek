@@ -97,6 +97,23 @@ void addMissingAtomsInStructure(GemmiWrapper &readStructure, PulchraWrapper &pul
     for (size_t ch = 0; ch < readStructure.chain.size(); ch++) {
         size_t chainStart = readStructure.chain[ch].first;
         size_t chainLen = readStructure.chain[ch].second - readStructure.chain[ch].first;
+
+        if (chainLen <= 3) {
+            continue;
+        }
+        bool allX = true;
+        for (size_t pos = 0; pos < chainLen; pos++) {
+            const char aa = readStructure.ami[chainStart+pos];
+            if (aa != 'X' && aa != 'x') {
+                allX = false;
+                break;
+            }
+        }
+        if (allX) {
+            // notProtein++;
+            continue;
+        }
+
         // Detect if structure is Ca only
         if (std::isnan(readStructure.n[chainStart + 0].x) &&
             std::isnan(readStructure.n[chainStart + 1].x) &&
@@ -165,48 +182,11 @@ void compute3DiInterfaces(GemmiWrapper &readStructure, StructureTo3Di &structure
     std::vector<std::pair<size_t, size_t>> interfaceChain;
     std::unordered_map<unsigned int, unsigned int> modelToInterfaceNum;
     for (size_t ch1 = 0; ch1 < readStructure.chain.size(); ch1++) {
-        size_t chainLen = readStructure.chain[ch1].second - readStructure.chain[ch1].first;
-        if (chainLen <= 3) {
-            // tooShort++;
-            continue;
-        }
-        bool allX = true;
-        for (size_t pos = 0; pos < chainLen; pos++) {
-            size_t chainStart = readStructure.chain[ch1].first;
-            const char aa = readStructure.ami[chainStart+pos];
-            if (aa != 'X' && aa != 'x') {
-                allX = false;
-                break;
-            }
-        }
-        if (allX) {
-            // notProtein++;
-            continue;
-        }
         for (size_t ch2 = ch1 + 1; ch2 < readStructure.chain.size(); ch2++) {
-            size_t chainLen = readStructure.chain[ch2].second - readStructure.chain[ch2].first;
-            if (chainLen <= 3) {
-                // tooShort++;
-                continue;
-            }
-            bool allX = true;
-            for (size_t pos = 0; pos < chainLen; pos++) {
-                size_t chainStart = readStructure.chain[ch2].first;
-                const char aa = readStructure.ami[chainStart+pos];
-                if (aa != 'X' && aa != 'x') {
-                    allX = false;
-                    break;
-                }
-            }
-            if (allX) {
-                // notProtein++;
-                continue;
-            }
             if (readStructure.modelIndices[ch1] == readStructure.modelIndices[ch2]) {
                 findInterfaceResidues(readStructure, readStructure.chain[ch1], readStructure.chain[ch2], resIdx1, distanceThreshold);
                 findInterfaceResidues(readStructure, readStructure.chain[ch2], readStructure.chain[ch1], resIdx2, distanceThreshold);
                 if (resIdx1.size() >= 4 && resIdx2.size() >= 4) {
-                    modelToInterfaceNum[readStructure.modelIndices[ch2]]++;
                     for (size_t i = 0; i < resIdx1.size(); i++) {
                         ca.push_back(readStructure.ca[resIdx1[i]]);
                         n.push_back(readStructure.n[resIdx1[i]]);
@@ -225,6 +205,40 @@ void compute3DiInterfaces(GemmiWrapper &readStructure, StructureTo3Di &structure
                                                                 c.data(),
                                                                 cb.data(),
                                                                 resIdx1.size() + resIdx2.size());
+                    bool allX1 = true;
+                    for (size_t i = 0; i < resIdx1.size(); i++) {
+                        const char aa = readStructure.ami[resIdx1[i]];
+                        if (aa != 'X' && aa != 'x') {
+                            allX1 = false;
+                            break;
+                        }
+                    }
+                    if (allX1) {
+                        resIdx1.clear();
+                        resIdx2.clear();
+                        ca.clear();
+                        n.clear();
+                        c.clear();
+                        cb.clear();
+                        continue;
+                    }
+                    bool allX2 = true;
+                    for (size_t i = 0; i < resIdx2.size(); i++) {
+                        const char aa = readStructure.ami[resIdx2[i]];
+                        if (aa != 'X' && aa != 'x') {
+                            allX2 = false;
+                            break;
+                        }
+                    }
+                    if (allX2) {
+                        resIdx1.clear();
+                        resIdx2.clear();
+                        ca.clear();
+                        n.clear();
+                        c.clear();
+                        cb.clear();
+                        continue;
+                    }
                     for (size_t i = 0; i < resIdx1.size(); i++) {
                         interfaceSeq3di.push_back(mat3Di.num2aa[static_cast<int>(states[i])]);
                         interfaceAmi.push_back(readStructure.ami[resIdx1[i]]);
@@ -235,6 +249,8 @@ void compute3DiInterfaces(GemmiWrapper &readStructure, StructureTo3Di &structure
                         interfaceAmi.push_back(readStructure.ami[resIdx2[i]]);
                         interfaceCa.push_back(readStructure.ca[resIdx2[i]]);
                     }
+                    
+                    modelToInterfaceNum[readStructure.modelIndices[ch2]]++;
                     interfaceChain.push_back(std::make_pair(prevInterfaceChainLen, prevInterfaceChainLen + resIdx1.size()));
                     prevInterfaceChainLen += resIdx1.size();
                     interfaceChain.push_back(std::make_pair(prevInterfaceChainLen, prevInterfaceChainLen + resIdx2.size()));
