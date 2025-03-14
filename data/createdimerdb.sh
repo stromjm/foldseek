@@ -36,8 +36,12 @@ if [ -e "${IN}.dbtype" ]; then
     changeIndex "${IN}_ca" "${TMP_PATH}/contactlist" "${OUT}_ca"
     changeIndex "${IN}_h" "${TMP_PATH}/contactlist" "${OUT}_h"
     
-    rm "${OUT}.lookup"
-    rm "${OUT}.source"
+    if [ -e "${OUT}.lookup" ]; then 
+        rm "${OUT}.lookup"
+    fi
+    if [ -e "${OUT}.source" ]; then 
+        rm "${OUT}.source"
+    fi
     
     awk 'FNR==NR {
         chainname[$1] = $2; next
