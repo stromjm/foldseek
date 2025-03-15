@@ -28,12 +28,13 @@ if [ -e "${IN}.dbtype" ]; then
     rm "${OUT}.index"
     rm "${OUT}_ss.index"
     rm "${OUT}_ca.index"
-    rm "${OUT}_h.index"
+    # shellcheck disable=SC2086
+    "$MMSEQS" rmdb "${OUT}_h" \
+        || fail "rmdb died"
 
     changeIndex "${IN}" "${TMP_PATH}/contactlist" "${OUT}"
     changeIndex "${IN}_ss" "${TMP_PATH}/contactlist" "${OUT}_ss"
     changeIndex "${IN}_ca" "${TMP_PATH}/contactlist" "${OUT}_ca"
-    changeIndex "${IN}_h" "${TMP_PATH}/contactlist" "${OUT}_h"
     
     if [ -e "${OUT}.lookup" ]; then 
         rm "${OUT}.lookup"
@@ -53,6 +54,11 @@ if [ -e "${IN}.dbtype" ]; then
         sub(/_[^_]+$/, "", $2)
         print $3"\t"$2
     }' "${OUT}.lookup" > "${OUT}.source"
+
+    # shellcheck disable=SC2086
+    "$MMSEQS" tsv2db "${OUT}.lookup" "${OUT}_h" ${VERBOSITY_PAR} \
+        || fail "tsv2db died"
+
 fi
 
 if [ -n "${REMOVE_TMP}" ]; then
