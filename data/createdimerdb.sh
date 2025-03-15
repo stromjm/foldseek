@@ -2,13 +2,12 @@
 
 changeIndex() {
     awk 'FNR==NR{
+        chain_off[$1] = $2;
         chain_len[$1] = $3; next
     } BEGIN{
-        i=0
         d=0
     } {
-        print d"\t"i"\t"chain_len[$1]
-        i += chain_len[$1]
+        print d"\t"chain_off[$1]"\t"chain_len[$1]
         d++
     }' "${1}.index" "${2}.index" > "${3}.index"
 }
