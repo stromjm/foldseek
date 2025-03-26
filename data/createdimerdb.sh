@@ -24,10 +24,17 @@ if [ -e "${IN}.dbtype" ]; then
         || fail "lndb died"
     "$MMSEQS" lndb "${IN}_h" "${OUT}_h" \
         || fail "lndb died"
+    if [ -e "${IN}_id" ]; then
+        "$MMSEQS" lndb "${IN}_id" "${OUT}_id" \
+            || fail "lndb died"
+    fi
 
     rm "${OUT}.index"
     rm "${OUT}_ss.index"
     rm "${OUT}_ca.index"
+    if [ -e "${IN}_id.index" ]; then
+        rm "${OUT}_id.index"
+    fi
     # shellcheck disable=SC2086
     "$MMSEQS" rmdb "${OUT}_h" \
         || fail "rmdb died"
@@ -35,6 +42,9 @@ if [ -e "${IN}.dbtype" ]; then
     changeIndex "${IN}" "${TMP_PATH}/contactlist" "${OUT}"
     changeIndex "${IN}_ss" "${TMP_PATH}/contactlist" "${OUT}_ss"
     changeIndex "${IN}_ca" "${TMP_PATH}/contactlist" "${OUT}_ca"
+    if [ -e "${IN}_id" ]; then
+        changeIndex "${IN}_id" "${TMP_PATH}/contactlist" "${OUT}_id"
+    fi
     
     if [ -e "${OUT}.lookup" ]; then 
         rm "${OUT}.lookup"
