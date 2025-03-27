@@ -39,11 +39,12 @@ if [ -e "${IN}.dbtype" ]; then
     "$MMSEQS" rmdb "${OUT}_h" \
         || fail "rmdb died"
 
-    changeIndex "${IN}" "${TMP_PATH}/contactlist" "${OUT}"
-    changeIndex "${IN}_ss" "${TMP_PATH}/contactlist" "${OUT}_ss"
-    changeIndex "${IN}_ca" "${TMP_PATH}/contactlist" "${OUT}_ca"
+    sort -nk2 "${TMP_PATH}/contactlist.index" > "${TMP_PATH}/contactlist2.index"
+    changeIndex "${IN}" "${TMP_PATH}/contactlist2" "${OUT}"
+    changeIndex "${IN}_ss" "${TMP_PATH}/contactlist2" "${OUT}_ss"
+    changeIndex "${IN}_ca" "${TMP_PATH}/contactlist2" "${OUT}_ca"
     if [ -e "${IN}_id" ]; then
-        changeIndex "${IN}_id" "${TMP_PATH}/contactlist" "${OUT}_id"
+        changeIndex "${IN}_id" "${TMP_PATH}/contactlist2" "${OUT}_id"
     fi
     
     if [ -e "${OUT}.lookup" ]; then 
@@ -52,13 +53,13 @@ if [ -e "${IN}.dbtype" ]; then
     if [ -e "${OUT}.source" ]; then 
         rm "${OUT}.source"
     fi
-    
+
     awk 'FNR==NR {
         chainname[$1] = $2; next
     } BEGIN {i = 0} {
         print i"\tDI"int(i/2)"_"chainname[$1]"\t"int(i/2)
         i++
-    }' "${IN}.lookup" "${TMP_PATH}/contactlist.index" > "${OUT}.lookup"
+    }' "${IN}.lookup" "${TMP_PATH}/contactlist2.index" > "${OUT}.lookup"
 
     awk 'NR%2==1 {
         sub(/_[^_]+$/, "", $2)
@@ -74,4 +75,5 @@ fi
 if [ -n "${REMOVE_TMP}" ]; then
     # shellcheck disable=SC2086
     "$MMSEQS" rmdb "${TMP_PATH}/contactlist"
+    rm "${TMP_PATH}/contactlist2.index"
 fi
