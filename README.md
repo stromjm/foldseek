@@ -361,7 +361,7 @@ The `easy-multimercluster` module is designed for multimer-level structural clus
 
 Make sure chain names in PDB/mmcIF files does not contain underscores(_).
 
-    foldseek easy-multimercluster example/ clu tmp --multimer-tm-threshold 0.7 --chain-tm-threshold 0.7 --interface-lddt-threshold 0.3
+    foldseek easy-multimercluster example/ clu tmp
 
 #### Output MultimerCluster
 ##### Tab-separated multimercluster
@@ -396,21 +396,21 @@ KVFG...L
 | -c                         | Alignment   | List matches above this fraction of aligned (covered) residues (see --cov-mode) (default: 0.0); higher coverage = more global alignment |
 | --multimer-tm-threshold    | Alignment   | accept alignments with multimer alignment TMscore > thr (default: 0.7)                                                                  |
 | --chain-tm-threshold       | Alignment   | accept alignments if every single chain TMscore > thr (default: 0.7)                                                                    |
-| --interface-lddt-threshold | Alignment   | accept alignments with an interface LDDT score > thr (default: 0.7)                                                                     |
+| --interface-lddt-threshold | Alignment   | accept alignments with an interface LDDT score > thr (default: 0.3)                                                                     |
 
 ### Interface
 The `easy-interfacesearch` and `easy-interfacecluster` modules are designed for interface-level search and clustering. Each first extracts the interfaces from the input multimer and then runs `multimersearch` or `multimercluster`, respectively.
 
 The commands below are equivalent.
 ```
-foldseek easy-interfacesearch example example result tmpFolder --exhaustive-search --multimer-tm-threshold 0.4
+foldseek easy-interfacesearch example example result tmpFolder
 ```
 
 ```
 foldseek createdb example/ db
 foldseek createdimerdb db dimerdb dimertmp
 foldseek createinterfacedb dimerdb interfacedb
-foldseek easy-multimersearch interfacedb interfacedb result tmpFolder --exhaustive-search --multimer-tm-threshold 0.4
+foldseek easy-multimersearch interfacedb interfacedb result tmpFolder
 ```
 
 ## Main Modules
@@ -418,6 +418,8 @@ foldseek easy-multimersearch interfacedb interfacedb result tmpFolder --exhausti
 - `easy-cluster`      fast protein structure clustering  
 - `easy-multimersearch`       fast protein multimer-level structure search  
 - `easy-multimercluster`       fast protein multimer-level structure clustering  
+- `easy-interfacesearch`       fast protein interface-level structure search  
+- `easy-interfacecluster`       fast protein interface-level structure clustering  
 - `createdb`          create a database from protein structures (PDB,mmCIF, mmJSON)
 - `databases`         download pre-assembled databases
 
